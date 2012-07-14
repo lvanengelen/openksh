@@ -1,6 +1,6 @@
-diff -rNu ../ksh/emacs.c ../ksh-new/emacs.c
---- ../ksh/emacs.c	2012-06-10 12:15:01.000000000 +0200
-+++ ../ksh-new/emacs.c	2012-07-14 11:07:15.669637802 +0200
+diff -rNu ../../ksh/emacs.c ../../ksh-new/emacs.c
+--- ../../ksh/emacs.c	2012-06-10 12:15:01.000000000 +0200
++++ ../../ksh-new/emacs.c	2012-07-14 11:07:15.669637802 +0200
 @@ -16,7 +16,7 @@
  
  #include "sh.h"
@@ -10,9 +10,9 @@ diff -rNu ../ksh/emacs.c ../ksh-new/emacs.c
  #include <ctype.h>
  #include <locale.h>
  #include "edit.h"
-diff -rNu ../ksh/main.c ../ksh-new/main.c
---- ../ksh/main.c	2011-09-07 13:33:25.000000000 +0200
-+++ ../ksh-new/main.c	2012-07-14 11:07:15.672971060 +0200
+diff -rNu ../../ksh/main.c ../../ksh-new/main.c
+--- ../../ksh/main.c	2011-09-07 13:33:25.000000000 +0200
++++ ../../ksh-new/main.c	2012-07-14 11:07:15.672971060 +0200
 @@ -9,6 +9,10 @@
  #include "sh.h"
  #include <sys/stat.h>
@@ -24,9 +24,9 @@ diff -rNu ../ksh/main.c ../ksh-new/main.c
  
  extern char **environ;
  
-diff -rNu ../ksh/sh.h ../ksh-new/sh.h
---- ../ksh/sh.h	2010-01-04 19:07:11.000000000 +0100
-+++ ../ksh-new/sh.h	2012-07-14 11:07:15.669637802 +0200
+diff -rNu ../../ksh/sh.h ../../ksh-new/sh.h
+--- ../../ksh/sh.h	2010-01-04 19:07:11.000000000 +0100
++++ ../../ksh-new/sh.h	2012-07-14 11:07:15.669637802 +0200
 @@ -16,15 +16,22 @@
  #include <stdbool.h>
  #include <stddef.h>
@@ -51,9 +51,9 @@ diff -rNu ../ksh/sh.h ../ksh-new/sh.h
  
  #include <paths.h>
  
-diff -rNu ../ksh/trap.c ../ksh-new/trap.c
---- ../ksh/trap.c	2010-05-19 19:36:08.000000000 +0200
-+++ ../ksh-new/trap.c	2012-07-14 11:07:15.672971060 +0200
+diff -rNu ../../ksh/trap.c ../../ksh-new/trap.c
+--- ../../ksh/trap.c	2010-05-19 19:36:08.000000000 +0200
++++ ../../ksh-new/trap.c	2012-07-14 11:07:15.672971060 +0200
 @@ -13,7 +13,7 @@
  void
  inittraps(void)
