@@ -1,0 +1,79 @@
+diff -rNu ../ksh/emacs.c ../ksh-new/emacs.c
+--- ../ksh/emacs.c	2012-06-10 12:15:01.000000000 +0200
++++ ../ksh-new/emacs.c	2012-07-14 11:07:15.669637802 +0200
+@@ -16,7 +16,7 @@
+ 
+ #include "sh.h"
+ #include <sys/stat.h>
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
+ #include <ctype.h>
+ #include <locale.h>
+ #include "edit.h"
+diff -rNu ../ksh/main.c ../ksh-new/main.c
+--- ../ksh/main.c	2011-09-07 13:33:25.000000000 +0200
++++ ../ksh-new/main.c	2012-07-14 11:07:15.672971060 +0200
+@@ -9,6 +9,10 @@
+ #include "sh.h"
+ #include <sys/stat.h>
+ #include <pwd.h>
++#ifndef _PW_NAME_LEN
++#include <utmp.h>
++#define _PW_NAME_LEN UT_NAMESIZE
++#endif
+ 
+ extern char **environ;
+ 
+diff -rNu ../ksh/sh.h ../ksh-new/sh.h
+--- ../ksh/sh.h	2010-01-04 19:07:11.000000000 +0100
++++ ../ksh-new/sh.h	2012-07-14 11:07:15.669637802 +0200
+@@ -16,15 +16,22 @@
+ #include <stdbool.h>
+ #include <stddef.h>
+ #include <stdlib.h>
++#include <bsd/stdlib.h>
+ #include <unistd.h>
+-#include <string.h>
++#include <bsd/string.h>
+ #include <stdarg.h>
++#include <time.h>
++#include <grp.h>
+ 
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <limits.h>
++#ifndef CHILD_MAX
++#define CHILD_MAX sysconf(_SC_CHILD_MAX)
++#endif
+ 
+ #include <signal.h>
++#include "posix_signals.h"
+ 
+ #include <paths.h>
+ 
+diff -rNu ../ksh/trap.c ../ksh-new/trap.c
+--- ../ksh/trap.c	2010-05-19 19:36:08.000000000 +0200
++++ ../ksh-new/trap.c	2012-07-14 11:07:15.672971060 +0200
+@@ -13,7 +13,7 @@
+ void
+ inittraps(void)
+ {
+-	int	i;
++	int	i, j;
+ 
+ 	/* Populate sigtraps based on sys_signame and sys_siglist. */
+ 	for (i = 0; i <= NSIG; i++) {
+@@ -22,7 +22,12 @@
+ 			sigtraps[i].name = "ERR";
+ 			sigtraps[i].mess = "Error handler";
+ 		} else {
+-			sigtraps[i].name = sys_signame[i];
++			for (j = 0; j < NSIG; j++) {
++				if (sys_signame[j].val == i) {
++					sigtraps[i].name = sys_signame[j].name;
++					break;
++				}
++			}
+ 			sigtraps[i].mess = sys_siglist[i];
+ 		}
+ 	}
