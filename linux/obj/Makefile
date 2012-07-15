@@ -1,6 +1,6 @@
 PROG=	ksh
 
-DESTDIR?=/usr/local
+DESTDIR?=/usr/local/
 BINDIR?=bin
 MANDIR?=man
 
@@ -17,9 +17,9 @@ DEFS=	-D_GNU_SOURCE -Wall -Wno-unused-result -Wno-unused-but-set-variable -Wno-p
 CFLAGS+=${DEFS} -I.. `pkg-config --cflags ${LIBS}`
 LDADD+= `pkg-config --libs ${LIBS}`
 
-MAN=	ksh.1
-LINKS=	rksh
-MLINKS=	rksh
+MAN=	${PROG}.1
+LINK=	rksh
+MLINK=	${LINK}.1
 
 .PHONY: build
 build: patch ${PROG}
@@ -36,20 +36,14 @@ $(PATCHEDFILE):
 install: install-bin install-man
 
 install-bin:
-	install -m 755 -d $(DESTDIR)/$(BINDIR)
-	install -m 755 ${PROG} $(DESTDIR)/$(BINDIR) 
-	@for x in $(LINKS); do \
-		echo "Linking $(PROG) -> $$x"; \
-		ln -sf $(DESTDIR)/$(BINDIR)/$(PROG) $(DESTDIR)/$(BINDIR)/$$x; \
-	done
+	install -m 755 -d $(DESTDIR)$(BINDIR)
+	install -m 755 ${PROG} $(DESTDIR)$(BINDIR) 
+	ln -sf $(DESTDIR)$(BINDIR)/$(PROG) $(DESTDIR)$(BINDIR)/$(LINK)
 
 install-man:
-	install -m 755 -d $(DESTDIR)/$(MANDIR)/man1 
-	install -m 644 $(KSHDIR)/$(MAN) $(DESTDIR)/$(MANDIR)/man1/$(MAN)
-	@for x in $(MLINKS); do \
-		echo "Linking $(PROG) -> $$x"; \
-		ln -sf $(DESTDIR)/$(MANDIR)/man1/$(PROG) $(DESTDIR)/$(MANDIR)/$$x; \
-	done
+	install -m 755 -d $(DESTDIR)$(MANDIR)/man1 
+	install -m 644 $(KSHDIR)/$(MAN) $(DESTDIR)$(MANDIR)/man1
+	ln -sf $(DESTDIR)$(MANDIR)/man1/$(MAN) $(DESTDIR)$(MANDIR)/man1/$(MLINK)
 
 .PHONY: clean
 clean:
