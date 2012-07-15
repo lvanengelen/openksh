@@ -18,7 +18,7 @@ CFLAGS+=${DEFS} -I.. `pkg-config --cflags ${LIBS}`
 LDADD+= `pkg-config --libs ${LIBS}`
 
 MAN=	ksh.1
-LINKS=	rksh sh
+LINKS=	rksh
 MLINKS=	rksh
 
 .PHONY: build
