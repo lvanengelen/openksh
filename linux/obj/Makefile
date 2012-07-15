@@ -24,11 +24,11 @@ MLINK=	${LINK}.1
 .PHONY: build
 build: patch ${PROG}
 
-PATCHEDFILE = $(KSHDIR)/patched
+PATCHEDFILE = ${KSHDIR}/patched
 
 .PHONY: patch
-patch: $(PATCHEDFILE)
-$(PATCHEDFILE):
+patch: ${PATCHEDFILE}
+${PATCHEDFILE}:
 	patch -p0 < ../linux.diff
 	touch $@
 
@@ -36,14 +36,14 @@ $(PATCHEDFILE):
 install: install-bin install-man
 
 install-bin:
-	install -m 755 -d $(DESTDIR)$(BINDIR)
-	install -m 755 ${PROG} $(DESTDIR)$(BINDIR) 
-	ln -sf $(DESTDIR)$(BINDIR)/$(PROG) $(DESTDIR)$(BINDIR)/$(LINK)
+	install -m 755 -d ${DESTDIR}${BINDIR}
+	install -m 755 ${PROG} ${DESTDIR}${BINDIR} 
+	ln -sf ${DESTDIR}${BINDIR}/${PROG} ${DESTDIR}${BINDIR}/${LINK}
 
 install-man:
-	install -m 755 -d $(DESTDIR)$(MANDIR)/man1 
-	install -m 644 $(KSHDIR)/$(MAN) $(DESTDIR)$(MANDIR)/man1
-	ln -sf $(DESTDIR)$(MANDIR)/man1/$(MAN) $(DESTDIR)$(MANDIR)/man1/$(MLINK)
+	install -m 755 -d ${DESTDIR}${MANDIR}/man1 
+	install -m 644 ${KSHDIR}/${MAN} ${DESTDIR}${MANDIR}/man1
+	ln -sf ${DESTDIR}${MANDIR}/man1/${MAN} ${DESTDIR}${MANDIR}/man1/${MLINK}
 
 .PHONY: clean
 clean:
