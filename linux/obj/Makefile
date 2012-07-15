@@ -13,7 +13,7 @@ SRCS=	alloc.c c_ksh.c c_sh.c c_test.c c_ulimit.c edit.c emacs.c eval.c \
 SRCS+=	posix_signals.c
 LIBS=	libbsd
 
-DEFS=	-D_GNU_SOURCE -Wall -Wno-unused-but-set-variable -Wno-pointer-sign -Werror
+DEFS=	-D_GNU_SOURCE -Wall -Wno-unused-result -Wno-unused-but-set-variable -Wno-pointer-sign -Werror
 CFLAGS+=${DEFS} -I.. `pkg-config --cflags ${LIBS}`
 LDADD+= `pkg-config --libs ${LIBS}`
 
