@@ -1,0 +1,46 @@
+pkgname=openksh-git
+pkgver=`date +%Y%m%d`
+pkgrel=1
+pkgdesc="Linux port of the OpenBSD shell."
+arch=('x86' 'x86_64')
+url='https://github.com/lvanengelen/openksh'
+license=('custom:Public Domain')
+makedepends=('git' 'cvs')
+depends=('libbsd')
+provides=('ksh')
+conflicts=('pdksh' 'openbsd-pdksh-git')
+
+_gitroot=https://github.com/lvanengelen/openksh
+_gitname="openksh"
+
+build() {
+  cd "$srcdir"
+  msg "Connecting to GIT server..."
+
+  if [ -d "$_gitname" ]; then
+    cd "$_gitname" && git pull origin
+    msg "The local files are updated."
+  else
+    git clone "$_gitroot" "$_gitname"
+  fi
+
+  msg "GIT checkout done or server timeout"
+  msg "Starting build..."
+
+  rm -rf "$srcdir/$_gitname-build"
+  git clone "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+
+  cd "$srcdir/$_gitname-build"
+  ./update.sh
+  cd linux/obj
+
+  make
+}
+
+package() {
+  cd "$srcdir/$_gitname-build/linux/obj"
+
+  make DESTDIR="$pkgdir/usr/" install
+}
+
+# vim:set ts=2 sw=2 et:
