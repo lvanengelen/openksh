@@ -1,6 +1,6 @@
 diff -rNu ../../ksh/emacs.c ../../ksh-new/emacs.c
 --- ../../ksh/emacs.c	2012-06-10 12:15:01.000000000 +0200
-+++ ../../ksh-new/emacs.c	2012-08-25 10:42:20.854621278 +0200
++++ ../../ksh-new/emacs.c	2012-08-25 13:39:09.766559324 +0200
 @@ -16,7 +16,7 @@
  
  #include "sh.h"
@@ -12,7 +12,7 @@ diff -rNu ../../ksh/emacs.c ../../ksh-new/emacs.c
  #include "edit.h"
 diff -rNu ../../ksh/main.c ../../ksh-new/main.c
 --- ../../ksh/main.c	2011-09-07 13:33:25.000000000 +0200
-+++ ../../ksh-new/main.c	2012-08-25 10:42:20.857954707 +0200
++++ ../../ksh-new/main.c	2012-08-25 13:39:09.769892675 +0200
 @@ -9,6 +9,10 @@
  #include "sh.h"
  #include <sys/stat.h>
@@ -26,7 +26,7 @@ diff -rNu ../../ksh/main.c ../../ksh-new/main.c
  
 diff -rNu ../../ksh/sh.h ../../ksh-new/sh.h
 --- ../../ksh/sh.h	2010-01-04 19:07:11.000000000 +0100
-+++ ../../ksh-new/sh.h	2012-08-25 10:42:52.911782525 +0200
++++ ../../ksh-new/sh.h	2012-08-25 13:39:09.769892675 +0200
 @@ -16,15 +16,23 @@
  #include <stdbool.h>
  #include <stddef.h>
@@ -54,8 +54,17 @@ diff -rNu ../../ksh/sh.h ../../ksh-new/sh.h
  
 diff -rNu ../../ksh/trap.c ../../ksh-new/trap.c
 --- ../../ksh/trap.c	2010-05-19 19:36:08.000000000 +0200
-+++ ../../ksh-new/trap.c	2012-08-25 10:42:20.857954707 +0200
-@@ -13,7 +13,7 @@
++++ ../../ksh-new/trap.c	2012-08-25 13:41:08.832534717 +0200
+@@ -6,14 +6,15 @@
+ 
+ #include "sh.h"
+ 
+-Trap sigtraps[NSIG + 1];
++#define SIGRSRV	32
+ 
++Trap sigtraps[NSIG + 1]; 
+ static struct sigaction Sigact_ign, Sigact_trap;
+ 
  void
  inittraps(void)
  {
@@ -64,17 +73,28 @@ diff -rNu ../../ksh/trap.c ../../ksh-new/trap.c
  
  	/* Populate sigtraps based on sys_signame and sys_siglist. */
  	for (i = 0; i <= NSIG; i++) {
-@@ -22,7 +22,12 @@
+@@ -21,8 +22,23 @@
+ 		if (i == SIGERR_) {
  			sigtraps[i].name = "ERR";
  			sigtraps[i].mess = "Error handler";
++		} else if (i == 0) {
++			sigtraps[i].name = "Signal 0";
++			sigtraps[i].mess = "Signal 0";
++		} else if (i >= SIGRSRV && i < SIGRTMIN) {
++			sigtraps[i].name = "SIG";
++			sigtraps[i].mess = "Reserved for PThreads";
++		} else if (i >= SIGRTMIN && i <= SIGRTMAX) {
++			sigtraps[i].name = "SIGRT";
++			sigtraps[i].mess = "Real time signal";
  		} else {
 -			sigtraps[i].name = sys_signame[i];
-+			for (j = 0; j < NSIG; j++) {
++			for (j = 0; j < sizeof(sys_signame) / sizeof(sys_signame[0]); ++j) {
 +				if (sys_signame[j].val == i) {
 +					sigtraps[i].name = sys_signame[j].name;
 +					break;
 +				}
 +			}
++
  			sigtraps[i].mess = sys_siglist[i];
  		}
  	}
