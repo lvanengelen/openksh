@@ -29,7 +29,7 @@ PATCHEDFILE = ${KSHDIR}/patched
 .PHONY: patch
 patch: ${PATCHEDFILE}
 ${PATCHEDFILE}:
-	patch -p0 < ../linux.diff
+	patch -p0 -d ../.. < ../linux.diff
 	touch $@
 
 .PHONY: install install-bin install-man
