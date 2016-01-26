@@ -4,7 +4,7 @@ DESTDIR?=/usr/local/
 BINDIR?=bin
 MANDIR?=man
 
-KSHDIR=	../../ksh
+KSHDIR=	../../${PROG}
 
 SRCS=	alloc.c c_ksh.c c_sh.c c_test.c c_ulimit.c edit.c emacs.c eval.c \
 	exec.c expr.c history.c io.c jobs.c lex.c mail.c main.c mknod.c \
@@ -29,7 +29,7 @@ PATCHEDFILE = ${KSHDIR}/patched
 .PHONY: patch
 patch: ${PATCHEDFILE}
 ${PATCHEDFILE}:
-	patch -p0 -d ../.. < ../linux.diff
+	patch -p1 -d ${KSHDIR} < ../linux.diff
 	touch $@
 
 .PHONY: install install-bin install-man
@@ -53,7 +53,7 @@ OBJS = ${SRCS:.c=.o}
 ${PROG}: ${OBJS}
 	${CC} ${LDFLAGS} -o $@ $^ ${LDADD}
 
-VPATH = ../../ksh:..
+VPATH = ${KSHDIR}:..
 
 check test:
 	/usr/bin/perl ${.CURDIR}/tests/th -s ${.CURDIR}/tests -p ./ksh -C \
