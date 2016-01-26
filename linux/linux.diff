@@ -1,70 +1,155 @@
-diff -rNu ksh/emacs.c ksh-new/emacs.c
---- ksh/emacs.c	2012-06-10 12:15:01.000000000 +0200
-+++ ksh-new/emacs.c	2012-08-25 13:39:09.766559324 +0200
-@@ -16,7 +16,7 @@
+diff -rNu ksh-old/emacs.c ksh/emacs.c
+--- ksh-old/emacs.c	2016-01-26 18:39:31.000000000 +0100
++++ ksh/emacs.c	2016-01-26 22:26:50.797021285 +0100
+@@ -14,7 +14,7 @@
+ #include "config.h"
+ #ifdef EMACS
  
- #include "sh.h"
- #include <sys/stat.h>
 -#include <sys/queue.h>
 +#include <bsd/sys/queue.h>
- #include <ctype.h>
- #include <locale.h>
- #include "edit.h"
-diff -rNu ksh/main.c ksh-new/main.c
---- ksh/main.c	2011-09-07 13:33:25.000000000 +0200
-+++ ksh-new/main.c	2012-08-25 13:39:09.769892675 +0200
-@@ -9,6 +9,10 @@
- #include "sh.h"
  #include <sys/stat.h>
- #include <pwd.h>
+ 
+ #include <ctype.h>
+diff -rNu ksh-old/exec.c ksh/exec.c
+--- ksh-old/exec.c	2015-12-30 10:07:00.000000000 +0100
++++ ksh/exec.c	2016-01-26 22:17:55.770327159 +0100
+@@ -12,6 +12,7 @@
+ #include <paths.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <bsd/stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
+diff -rNu ksh-old/history.c ksh/history.c
+--- ksh-old/history.c	2015-12-30 10:07:00.000000000 +0100
++++ ksh/history.c	2016-01-26 22:26:50.797021285 +0100
+@@ -13,6 +13,7 @@
+  *		to work on your system
+  */
+ 
++#include <sys/file.h>
+ #include <sys/stat.h>
+ 
+ #include <errno.h>
+diff -rNu ksh-old/io.c ksh/io.c
+--- ksh-old/io.c	2015-12-14 14:59:42.000000000 +0100
++++ ksh/io.c	2016-01-26 22:26:50.797021285 +0100
+@@ -9,6 +9,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
+diff -rNu ksh-old/jobs.c ksh/jobs.c
+--- ksh-old/jobs.c	2015-12-30 10:07:00.000000000 +0100
++++ ksh/jobs.c	2016-01-26 22:26:50.797021285 +0100
+@@ -25,6 +25,7 @@
+ #include <fcntl.h>
+ #include <limits.h>
+ #include <stdlib.h>
++#include <bsd/stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
+@@ -37,6 +38,10 @@
+ #define PSIGNALLED	2
+ #define PSTOPPED	3
+ 
++#ifndef CHILD_MAX
++#define CHILD_MAX sysconf(_SC_CHILD_MAX)
++#endif
++
+ typedef struct proc	Proc;
+ struct proc {
+ 	Proc	*next;		/* next process in pipeline (if any) */
+diff -rNu ksh-old/lex.c ksh/lex.c
+--- ksh-old/lex.c	2015-12-30 10:07:00.000000000 +0100
++++ ksh/lex.c	2016-01-26 22:26:50.797021285 +0100
+@@ -9,6 +9,7 @@
+ #include <libgen.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <time.h>
+ #include <unistd.h>
+ 
+ #include "sh.h"
+diff -rNu ksh-old/main.c ksh/main.c
+--- ksh-old/main.c	2015-12-30 10:07:00.000000000 +0100
++++ ksh/main.c	2016-01-26 22:26:50.800354618 +0100
+@@ -14,6 +14,10 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
 +#ifndef _PW_NAME_LEN
 +#include <utmp.h>
 +#define _PW_NAME_LEN UT_NAMESIZE
 +#endif
  
- extern char **environ;
- 
-diff -rNu ksh/sh.h ksh-new/sh.h
---- ksh/sh.h	2010-01-04 19:07:11.000000000 +0100
-+++ ksh-new/sh.h	2012-08-25 13:39:09.769892675 +0200
-@@ -16,15 +16,23 @@
- #include <stdbool.h>
- #include <stddef.h>
- #include <stdlib.h>
-+#include <bsd/stdlib.h>
- #include <unistd.h>
--#include <string.h>
-+#include <bsd/unistd.h>
-+#include <bsd/string.h>
- #include <stdarg.h>
-+#include <time.h>
-+#include <grp.h>
- 
- #include <errno.h>
- #include <fcntl.h>
- #include <limits.h>
-+#ifndef CHILD_MAX
-+#define CHILD_MAX sysconf(_SC_CHILD_MAX)
-+#endif
- 
- #include <signal.h>
-+#include "posix_signals.h"
- 
- #include <paths.h>
- 
-diff -rNu ksh/trap.c ksh-new/trap.c
---- ksh/trap.c	2010-05-19 19:36:08.000000000 +0200
-+++ ksh-new/trap.c	2012-08-25 13:41:08.832534717 +0200
-@@ -6,14 +6,15 @@
- 
  #include "sh.h"
  
--Trap sigtraps[NSIG + 1];
+@@ -152,13 +156,13 @@
+ 
+ 	kshname = argv[0];
+ 
+-#ifndef MKNOD
++/*#ifndef MKNOD
+ 	if (pledge("stdio rpath wpath cpath fattr flock getpw proc exec tty",
+ 	    NULL) == -1) {
+ 		perror("pledge");
+ 		exit(1);
+ 	}
+-#endif
++#endif*/
+ 
+ 	ainit(&aperm);		/* initialize permanent Area */
+ 
+diff -rNu ksh-old/misc.c ksh/misc.c
+--- ksh-old/misc.c	2015-12-21 05:57:50.000000000 +0100
++++ ksh/misc.c	2016-01-26 22:26:50.800354618 +0100
+@@ -7,6 +7,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <grp.h>
+ #include <limits.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff -rNu ksh-old/sh.h ksh/sh.h
+--- ksh-old/sh.h	2015-12-30 10:07:00.000000000 +0100
++++ ksh/sh.h	2016-01-26 22:26:50.800354618 +0100
+@@ -10,6 +10,9 @@
+ 
+ /* Start of common headers */
+ 
++#include <sys/stat.h>
++#include <bsd/string.h>
++
+ #include <setjmp.h>
+ #include <stdarg.h>
+ #include <signal.h>
+diff -rNu ksh-old/trap.c ksh/trap.c
+--- ksh-old/trap.c	2015-12-14 14:59:42.000000000 +0100
++++ ksh/trap.c	2016-01-26 22:26:50.800354618 +0100
+@@ -6,11 +6,15 @@
+ 
+ #include <ctype.h>
+ #include <errno.h>
++#include <signal.h>
+ #include <string.h>
+ #include <unistd.h>
+ 
++#include "posix_signals.h"
+ #include "sh.h"
+ 
 +#define SIGRSRV	32
++
+ Trap sigtraps[NSIG + 1];
  
-+Trap sigtraps[NSIG + 1]; 
  static struct sigaction Sigact_ign, Sigact_trap;
- 
+@@ -18,7 +22,7 @@
  void
  inittraps(void)
  {
@@ -73,7 +158,7 @@ diff -rNu ksh/trap.c ksh-new/trap.c
  
  	/* Populate sigtraps based on sys_signame and sys_siglist. */
  	for (i = 0; i <= NSIG; i++) {
-@@ -21,8 +22,23 @@
+@@ -26,8 +30,22 @@
  		if (i == SIGERR_) {
  			sigtraps[i].name = "ERR";
  			sigtraps[i].mess = "Error handler";
@@ -94,7 +179,18 @@ diff -rNu ksh/trap.c ksh-new/trap.c
 +					break;
 +				}
 +			}
-+
  			sigtraps[i].mess = sys_siglist[i];
  		}
  	}
+diff -rNu ksh-old/var.c ksh/var.c
+--- ksh-old/var.c	2015-12-30 10:07:00.000000000 +0100
++++ ksh/var.c	2016-01-26 22:26:50.800354618 +0100
+@@ -1033,7 +1033,7 @@
+ 		break;
+ 	case V_RANDOM:
+ 		vp->flag &= ~SPECIAL;
+-		srand_deterministic((unsigned int)intval(vp));
++		srand((unsigned int)intval(vp));
+ 		vp->flag |= SPECIAL;
+ 		break;
+ 	case V_SECONDS:
